@@ -3,9 +3,9 @@ import argparse
 parser = argparse.ArgumentParser(description='Hyper-parameters management')
 
 # Hardware options
-parser.add_argument('--n_threads', type=int, default=6,help='number of threads for data loading')
+parser.add_argument('--n_threads', type=int, default=0,help='number of threads for data loading')
 parser.add_argument('--cpu', action='store_true',help='use cpu only')
-parser.add_argument('--gpu', type=list,default=0, help='use cpu only')
+parser.add_argument('--gpu', type=list,default=[0], help='use cpu only')
 parser.add_argument('--seed', type=int, default=2021, help='random seed')
 
 # Preprocess parameters

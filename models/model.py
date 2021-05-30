@@ -11,7 +11,7 @@ class ConvBlock(nn.Module):
         self.batch_norm = nn.BatchNorm3d(num_features=out_channels)
 
     def forward(self, x):
-        x = self.batch_norm(self.cov3d(x))
+        x = self.batch_norm(self.conv3d(x))
         x = F.elu(x)
         return x
 
@@ -39,10 +39,9 @@ class EncoderBlock(nn.Module):
         for k, op in self.module_dict.items():
             if k.startswith("conv"):
                 x = op(x)
-                features.append(x)
             else:
-                x = op(x)
                 features.append(x)
+                x = op(x)
         return x, features
 
 
@@ -84,7 +83,7 @@ class DecodeBlock(nn.Module):
 
     def forward(self, x, down_sampling_features):
         for k, op in self.module_dict.items():
-            if k.startswitch("deconv"):
+            if k.startswith("deconv"):
                 x = op(x)
                 x = torch.cat((down_sampling_features[int(k[-1])], x), dim=1)
             elif k.startswith("conv"):
