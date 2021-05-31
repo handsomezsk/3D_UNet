@@ -1,5 +1,4 @@
-from dataset.dataset_lits_val import Val_Dataset
-from dataset.dataset_lits_train import Train_Dataset
+from dataset.train_dataset import TrainDataset
 
 from torch.utils.data import DataLoader
 import torch
@@ -39,7 +38,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
     train_dice = metrics.DiceAverage(n_labels)
 
     for idx, (data, target) in tqdm(enumerate(train_loader),total=len(train_loader)):
-        data, target = data.float(), target.long()
+        data, target = data.float(), target.squeeze(1).long()
         target = common.to_one_hot_3d(target,n_labels)
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
@@ -63,9 +62,16 @@ if __name__ == '__main__':
     if not os.path.exists(save_path): os.mkdir(save_path)
     device = torch.device('cpu' if args.cpu else 'cuda')
     # data info
-    train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,num_workers=args.n_threads, shuffle=True)
-    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,num_workers=args.n_threads, shuffle=False)
+    train_image_dir = os.path.join(args.train_data_path, 'ribfrac-train-images')
+    train_label_dir = os.path.join(args.train_data_path, 'ribfrac-train-labels')
+    val_image_dir = os.path.join(args.train_data_path, 'ribfrac-val-images')
+    val_label_dir = os.path.join(args.train_data_path, 'ribfrac-val-labels')
+    train_data = TrainDataset(args, train_image_dir, train_label_dir)
+    train_loader = TrainDataset.get_dataloader(args, train_data)
+    val_data = TrainDataset(args, val_image_dir, val_label_dir)
+    val_loader = TrainDataset.get_dataloader(args, val_data)
 
+    
     # model info
     model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
 

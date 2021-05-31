@@ -15,19 +15,18 @@ parser.add_argument('--lower', type=int, default=-200, help='')
 parser.add_argument('--norm_factor', type=float, default=200.0, help='')
 parser.add_argument('--expand_slice', type=int, default=20, help='')
 parser.add_argument('--min_slices', type=int, default=48, help='')
-parser.add_argument('--xy_down_scale', type=float, default=0.5, help='')
 parser.add_argument('--slice_down_scale', type=float, default=1.0, help='')
 parser.add_argument('--valid_rate', type=float, default=0.2, help='')
 
 # data in/out and dataset
-parser.add_argument('--dataset_path',default = '/ssd/lzq/dataset/fixed_lits',help='fixed trainset root path')
+parser.add_argument('--train_data_path', default = '/content/drive/Shareddrives/课程实验/datasets', help='trainset root path')
 parser.add_argument('--test_data_path',default = '/ssd/lzq/dataset/LiTS/test',help='Testset path')
 parser.add_argument('--save',default='ResUNet',help='save path of trained model')
 parser.add_argument('--batch_size', type=list, default=2,help='batch size of trainset')
 
 # train
 parser.add_argument('--epochs', type=int, default=200, metavar='N',help='number of epochs to train (default: 200)')
-parser.add_argument('--lr', type=float, default=0.0001, metavar='LR',help='learning rate (default: 0.0001)')
+parser.add_argument('--lr', type=float, default=0.001, metavar='LR',help='learning rate (default: 0.0001)')
 parser.add_argument('--early-stop', default=30, type=int, help='early stopping (default: 30)')
 parser.add_argument('--crop_size', type=int, default=48)
 parser.add_argument('--val_crop_max_size', type=int, default=96)
