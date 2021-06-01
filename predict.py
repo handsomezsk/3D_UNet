@@ -114,7 +114,8 @@ def predict(args):
         for file in os.listdir(img_path) if "nii" in file])
     image_id_list = [os.path.basename(path).split("-")[0]
         for path in image_path_list]
-
+    
+    progress = tqdm(total=len(image_id_list))
     for image_id, image_path in zip(image_id_list, image_path_list):
         dataset = TestDataset(args, image_path)
         dataloader = TestDataset.get_dataloader(dataset,
@@ -125,6 +126,8 @@ def predict(args):
         pred_image = nib.Nifti1Image(pred_label, dataset.image_affine)
         pred_path = os.path.join(args.pred_path, f"{image_id}_pred.nii.gz")
         nib.save(pred_image, pred_path)
+        
+        progress.update()
 
 
 if __name__ == "__main__":
