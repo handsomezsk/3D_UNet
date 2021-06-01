@@ -76,7 +76,7 @@ def _predict_single_image(model, dataloader, postprocess, prob_thresh,
         for _, sample in enumerate(dataloader):
             images, centers = sample
             images = images.cuda()
-            output = model(images).sigmoid().cpu().numpy()
+            output = model(images).sigmoid().cpu().numpy()[:,1]
             for i in range(len(centers)):
                 center_x, center_y, center_z = centers[i]
                 cur_pred_patch = pred[
@@ -98,24 +98,6 @@ def _predict_single_image(model, dataloader, postprocess, prob_thresh,
     return pred
 
 
-def _make_submission_files(pred, image_id, affine):
-    pred_label = label(pred > 0).astype(np.int16)
-    pred_regions = regionprops(pred_label, pred)
-    pred_index = [0] + [region.label for region in pred_regions]
-    pred_proba = [0.0] + [region.mean_intensity for region in pred_regions]
-    # placeholder for label class since classifaction isn't included
-    pred_label_code = [0] + [1] * int(pred_label.max())
-    pred_image = nib.Nifti1Image(pred_label, affine)
-    pred_info = pd.DataFrame({
-        "public_id": [image_id] * len(pred_index),
-        "label_id": pred_index,
-        "confidence": pred_proba,
-        "label_code": pred_label_code
-    })
-
-    return pred_image, pred_info
-
-
 def predict(args):
     batch_size = 16
     num_workers = args.n_threads
@@ -133,25 +115,16 @@ def predict(args):
     image_id_list = [os.path.basename(path).split("-")[0]
         for path in image_path_list]
 
-    progress = tqdm(total=len(image_id_list))
-    pred_info_list = []
     for image_id, image_path in zip(image_id_list, image_path_list):
         dataset = TestDataset(args, image_path)
         dataloader = TestDataset.get_dataloader(dataset,
             batch_size, num_workers)
         pred_arr = _predict_single_image(model, dataloader, postprocess,
             0.1, 300, 100)
-        pred_image, pred_info = _make_submission_files(pred_arr, image_id,
-            dataset.image_affine)
-        pred_info_list.append(pred_info)
+        pred_label = label(pred_arr > 0).astype(np.int16)
+        pred_image = nib.Nifti1Image(pred_label, dataset.image_affine)
         pred_path = os.path.join(args.pred_path, f"{image_id}_pred.nii.gz")
         nib.save(pred_image, pred_path)
-
-        progress.update()
-
-    pred_info = pd.concat(pred_info_list, ignore_index=True)
-    pred_info.to_csv(os.path.join(args.pred_path, "pred_info.csv"),
-        index=False)
 
 
 if __name__ == "__main__":

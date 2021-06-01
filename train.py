@@ -6,6 +6,7 @@ import torch.optim as optim
 from tqdm import tqdm
 import config
 import time
+import matplotlib.pyplot as plt
 
 from models.model import UNet
 
@@ -93,7 +94,6 @@ if __name__ == '__main__':
         best = [0, 0]
 
     common.print_network(model)
-    model = torch.nn.DataParallel(model, device_ids=args.gpu)  # multi-GPU
  
     loss = loss.TverskyLoss()
 
