@@ -95,9 +95,9 @@ class DecodeBlock(nn.Module):
 class UNet(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(UNet, self).__init__()
-        self.enc = EncoderBlock(in_channels)
-        self.dec = DecodeBlock(out_channels)
+        self.encoder = EncoderBlock(in_channels)
+        self.decoder = DecodeBlock(out_channels)
     def forward(self, x):
-        x, down_sampling_features = self.enc(x)
-        x = self.dec(x, down_sampling_features)
+        x, down_sampling_features = self.encoder(x)
+        x = self.decoder(x, down_sampling_features)
         return x

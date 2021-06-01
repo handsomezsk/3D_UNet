@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from skimage.measure import regionprops
 from torch.utils.data import DataLoader, Dataset
-from .transforms import Compose, Window, MinMaxNorm
+from .transforms import Compose, Window, MinMaxNorm, RandomRotate
 
 
 class TrainDataset(Dataset):
